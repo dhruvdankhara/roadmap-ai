@@ -1,6 +1,6 @@
 import "@xyflow/react/dist/style.css";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { MarkerType, type Node, type Edge } from "@xyflow/react";
 import Canvas from "./Canvas";
 
