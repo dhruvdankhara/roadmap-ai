@@ -61,11 +61,30 @@ body {
   border: 2px solid white !important;
 }
 
-/* Simple Node styling */
-.react-flow__node {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+/* Annotation Node */
+
+.react-flow__node-annotation {
+  font-size: 32px;
+  width: 400px;
+  color: #683bfa;
+  position: absolute;
+  box-shadow: none;
+  font-family: monospace;
+  text-align: left;
+  background-color: transparent;
+  border: none;
 }
 
-.react-flow__node:hover {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+.react-flow__node-annotation .annotation-content {
+  padding: 10px;
+  display: flex;
+}
+
+.react-flow__node-annotation .annotation-level {
+  margin-right: 4px;
+}
+
+.react-flow__node-annotation .annotation-arrow {
+  position: absolute;
+  font-size: 40px;
 }

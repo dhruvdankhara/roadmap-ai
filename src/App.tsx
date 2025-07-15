@@ -8,16 +8,22 @@ import { useNavigate, useParams } from "react-router-dom";
 interface Subtopic {
   title: string;
   description: string;
+  practicalExample: string;
 }
 
 interface RoadmapNode {
   title: string;
+  duration: string;
+  order: 1;
+  prerequisite: string;
   subtopics: Subtopic[];
 }
 
 interface RoadmapData {
   title: string;
   description: string;
+  difficultyLevel: string;
+  estimatedDuration: string;
   nodes: RoadmapNode[];
 }
 
@@ -30,7 +36,22 @@ const OverviewFlow = () => {
   const [data, setData] = useState<RoadmapData>();
 
   const generateNodeEdges = (data: RoadmapData): void => {
-    const nodes: Node[] = [];
+    const nodes: Node[] = [
+      {
+        id: "anotation-node",
+        type: "annotation",
+        selectable: false,
+        data: {
+          label: data.title,
+          level: 0,
+          arrowStyle: {
+            right: "50%",
+            bottom: "-30%",
+          },
+        },
+        position: { x: -100, y: -150 },
+      },
+    ];
     const edges: Edge[] = [];
     let nodeIdCounter = 0;
 
@@ -71,7 +92,11 @@ const OverviewFlow = () => {
         id: mainNodeId.toString(),
         type: "main",
         position: { x: mainNodeX, y: config.mainNodeY },
-        data: { label: mainTopic.title },
+        data: {
+          label: mainTopic.title,
+          duration: mainTopic.duration,
+          prerequisite: mainTopic.prerequisite,
+        },
       });
 
       const sourceNodeId = mainIndex === 0 ? startNodeId : nodeIdCounter - 2;
@@ -97,8 +122,9 @@ const OverviewFlow = () => {
           type: "circle",
           position: { x: subtopicX, y: config.subtopicY },
           data: {
-            label: subtopic.title,
+            title: subtopic.title,
             description: subtopic.description,
+            practicalExample: subtopic.practicalExample,
           },
         });
 
@@ -192,10 +218,46 @@ const OverviewFlow = () => {
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 leading-tight">
             {data.title}
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Your personalized learning roadmap with structured milestones and
-            actionable steps
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-4">
+            {data.description ||
+              "Your personalized learning roadmap with structured milestones and actionable steps"}
           </p>
+
+          <div className="flex items-center justify-center gap-6 text-sm">
+            {data.estimatedDuration && (
+              <div className="flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full">
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span className="font-medium">{data.estimatedDuration}</span>
+              </div>
+            )}
+
+            {data.difficultyLevel && (
+              <div className="flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-full">
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span className="font-medium">{data.difficultyLevel}</span>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -267,8 +329,12 @@ const OverviewFlow = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-3xl font-bold text-gray-900">AI</p>
-                <p className="text-sm text-gray-600 font-medium">Generated</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {data.difficultyLevel || "Adaptive"}
+                </p>
+                <p className="text-sm text-gray-600 font-medium">
+                  Difficulty Level
+                </p>
               </div>
             </div>
           </div>

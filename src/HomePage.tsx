@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { callGeminiAPI } from "./gemini";
+import { callGeminiAPI } from "./lib/gemini";
 import { databases } from "./lib/appwrite";
 import { ID } from "appwrite";
 
@@ -111,6 +111,7 @@ const HomePage = () => {
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder="Example: 'I want to become a full-stack web developer focusing on React and Node.js' or 'Create a roadmap to master data science with Python and machine learning'"
                   className="w-full h-48 p-6 border-2 border-gray-200 rounded-2xl text-lg text-gray-800 resize-none outline-none transition-all duration-300 focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10 bg-gray-50/50 placeholder-gray-400"
+                  disabled={isLoading}
                 />
                 <div className="absolute bottom-4 right-4 flex items-center gap-3">
                   <span className="text-sm text-gray-400">
@@ -155,11 +156,11 @@ const HomePage = () => {
 
                 <button
                   onClick={handleGenerate}
-                  disabled={!inputText.trim() || isLoading}
+                  disabled={inputText.trim().length < 3 || isLoading}
                   className={`
                     flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 transform
                     ${
-                      inputText.trim() && !isLoading
+                      inputText.trim().length > 3 && !isLoading
                         ? "bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-700 hover:to-purple-700 hover:scale-105 hover:shadow-2xl shadow-lg"
                         : "bg-gray-200 text-gray-400 cursor-not-allowed"
                     }

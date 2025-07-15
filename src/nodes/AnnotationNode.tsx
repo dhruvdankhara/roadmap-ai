@@ -7,7 +7,7 @@ interface AnnotationData {
 function AnnotationNode({ data }: { data: AnnotationData }) {
   return (
     <>
-      <div className="annotation-content">
+      <div className="annotation-content ">
         <div className="annotation-level">{data.level}.</div>
         <div>{data.label}</div>
       </div>
