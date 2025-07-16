@@ -3,15 +3,25 @@ import { useNavigate } from "react-router-dom";
 import { callGeminiAPI } from "./lib/gemini";
 import { databases } from "./lib/appwrite";
 import { ID } from "appwrite";
+import LoginDialog from "./LoginDialog";
+import { useAuth } from "./hooks/useAuth";
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const authContext = useAuth();
+  const user = authContext?.user;
 
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
 
   const handleGenerate = async () => {
     if (!inputText.trim()) return;
+
+    if (!user) {
+      setShowLoginDialog(true);
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -20,14 +30,22 @@ const HomePage = () => {
       const result = await callGeminiAPI(inputText);
       console.log("Gemini Response:", result);
 
+      const documentData: Record<string, string> = {
+        prompt: inputText,
+        data: JSON.stringify(result),
+      };
+
+      // If user is logged in, associate the roadmap with their account
+      if (user) {
+        documentData.userId = user.$id;
+        documentData.userEmail = user.email;
+      }
+
       const response = await databases.createDocument(
         "6874d2200030c6ec9e6f",
         "6874d24a0021ae17ca60",
         ID.unique(),
-        {
-          prompt: inputText,
-          data: JSON.stringify(result),
-        }
+        documentData
       );
 
       navigate(`/roadmap/${response.$id}`);
@@ -40,14 +58,53 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex flex-col">
+      <LoginDialog
+        isOpen={showLoginDialog}
+        onClose={() => setShowLoginDialog(false)}
+        onLoginSuccess={(userData) => {
+          console.log("Login successful:", userData);
+          setShowLoginDialog(false);
+        }}
+      />
+
       <header className="px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-xl font-bold text-gray-900">RoadmapAI</span>
           </div>
-          <div className="hidden md:flex items-center gap-2 text-sm text-gray-600">
-            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-            <span>AI Powered</span>
+
+          <div className="flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-2 text-sm text-gray-600">
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              <span>AI Powered</span>
+            </div>
+
+            {user ? (
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => navigate("/my-roadmaps")}
+                  className="text-sm text-violet-600 hover:text-violet-700 font-medium"
+                >
+                  My Roadmaps
+                </button>
+                <span className="text-sm text-gray-600">
+                  Welcome, {user.name}
+                </span>
+                <button
+                  onClick={() => authContext?.logout?.()}
+                  className="text-sm text-gray-600 hover:text-gray-900 font-medium"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowLoginDialog(true)}
+                className="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+              >
+                Sign In
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -153,6 +210,18 @@ const HomePage = () => {
                     <span>Results in 10-30 seconds</span>
                   </div>
                 </div>
+
+                {!user && (
+                  <p className="text-sm text-gray-500 text-center mt-3">
+                    <button
+                      onClick={() => setShowLoginDialog(true)}
+                      className="text-violet-600 hover:text-violet-700 font-medium"
+                    >
+                      Sign in
+                    </button>{" "}
+                    to save and track your roadmaps
+                  </p>
+                )}
 
                 <button
                   onClick={handleGenerate}
