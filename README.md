@@ -19,7 +19,7 @@
 
 ## 🚀 Demo
 
-**Live Demo:** [Coming Soon](#)
+**Live Demo:** [Click Here](https://roadmap-gen-ai.vercel.app/)
 
 ### Example Roadmaps
 
