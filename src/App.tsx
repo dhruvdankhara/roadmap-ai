@@ -1,9 +1,10 @@
 import "@xyflow/react/dist/style.css";
 import { useEffect, useState } from "react";
 import { MarkerType, type Node, type Edge } from "@xyflow/react";
+import * as Tabs from "@radix-ui/react-tabs";
 import Canvas from "./Canvas";
 import { databases } from "./lib/appwrite";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 interface Subtopic {
   title: string;
@@ -12,6 +13,7 @@ interface Subtopic {
 }
 
 interface RoadmapNode {
+  id: string;
   title: string;
   duration: string;
   order: 1;
@@ -29,11 +31,19 @@ interface RoadmapData {
 
 const OverviewFlow = () => {
   const { roadmapId } = useParams<{ roadmapId: string }>();
-  const navigate = useNavigate();
 
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [data, setData] = useState<RoadmapData>();
+  const [selectedSubtopic, setSelectedSubtopic] = useState<Subtopic | null>(
+    null
+  );
+  const [activeTab, setActiveTab] = useState<string>("chat");
+
+  const handleSubtopicClick = (subtopic: Subtopic) => {
+    setSelectedSubtopic(subtopic);
+    setActiveTab("details");
+  };
 
   const generateNodeEdges = (data: RoadmapData): void => {
     const nodes: Node[] = [
@@ -49,19 +59,19 @@ const OverviewFlow = () => {
             bottom: "-30%",
           },
         },
-        position: { x: -100, y: -150 },
+        position: { x: -100, y: -350 },
       },
     ];
     const edges: Edge[] = [];
     let nodeIdCounter = 0;
 
     const config = {
-      startX: 100,
-      mainNodeSpacingX: 300,
-      mainNodeY: 50,
-      subtopicY: 400,
-      subtopicSpacingX: 200,
-      minSubtopicSpacing: 200,
+      startY: 0,
+      mainNodeSpacingY: 150,
+      mainNodeX: 0,
+      subtopicX: 600,
+      subtopicSpacingY: 200,
+      minSubtopicSpacing: 100,
     };
 
     // Start node
@@ -70,11 +80,11 @@ const OverviewFlow = () => {
       id: startNodeId.toString(),
       type: "start",
       data: { label: data.title },
-      position: { x: config.startX, y: config.mainNodeY },
+      position: { y: config.startY, x: config.mainNodeX },
     });
 
-    let currentMainX = config.startX + config.mainNodeSpacingX;
-    let globalSubtopicX = config.startX + 100;
+    let currentMainY = config.startY + config.mainNodeSpacingY;
+    let globalSubtopicY = config.startY + 100;
 
     data.nodes.forEach((mainTopic, mainIndex) => {
       const mainNodeId = nodeIdCounter++;
@@ -82,20 +92,21 @@ const OverviewFlow = () => {
       // Calculate space
       const subtopicCount = mainTopic.subtopics.length;
       const requiredWidth = Math.max(
-        subtopicCount * config.subtopicSpacingX,
+        subtopicCount * config.subtopicSpacingY,
         config.minSubtopicSpacing * subtopicCount
       );
 
-      const mainNodeX = currentMainX + requiredWidth / 2 - 100;
+      const mainNodeY = currentMainY + requiredWidth / 2 - 100;
 
       nodes.push({
         id: mainNodeId.toString(),
         type: "main",
-        position: { x: mainNodeX, y: config.mainNodeY },
+        position: { y: mainNodeY, x: config.mainNodeX },
         data: {
           label: mainTopic.title,
           duration: mainTopic.duration,
           prerequisite: mainTopic.prerequisite,
+          isRight: mainNodeId % 2 !== 0,
         },
       });
 
@@ -111,16 +122,19 @@ const OverviewFlow = () => {
       });
 
       // subtopics
-      const subtopicStartX = currentMainX + 50;
+      const subtopicStartY = currentMainY + 50;
       mainTopic.subtopics.forEach((subtopic, subtopicIndex) => {
         const subtopicNodeId = `${mainNodeId}-sub-${subtopicIndex}`;
-        const subtopicX =
-          subtopicStartX + subtopicIndex * config.subtopicSpacingX;
+        const subtopicY =
+          subtopicStartY + subtopicIndex * config.subtopicSpacingY;
 
         nodes.push({
           id: subtopicNodeId,
           type: "circle",
-          position: { x: subtopicX, y: config.subtopicY },
+          position: {
+            x: mainNodeId % 2 !== 0 ? config.subtopicX : -config.subtopicX,
+            y: subtopicY,
+          },
           data: {
             title: subtopic.title,
             description: subtopic.description,
@@ -138,8 +152,8 @@ const OverviewFlow = () => {
         });
       });
 
-      currentMainX += requiredWidth + config.mainNodeSpacingX;
-      globalSubtopicX = Math.max(globalSubtopicX, currentMainX);
+      currentMainY += requiredWidth + config.mainNodeSpacingY;
+      globalSubtopicY = Math.max(globalSubtopicY, currentMainY);
     });
 
     setNodes(nodes);
@@ -183,176 +197,239 @@ const OverviewFlow = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-10">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate(-1)}
-                className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="font-medium">Back to Home</span>
-              </button>
-            </div>
-            <div className="flex items-center gap-3 text-xl font-bold text-gray-900">
-              RoadmapAI
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="container mx-auto px-6 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 leading-tight">
-            {data.title}
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-4">
-            {data.description ||
-              "Your personalized learning roadmap with structured milestones and actionable steps"}
-          </p>
-
-          <div className="flex items-center justify-center gap-6 text-sm">
-            {data.estimatedDuration && (
-              <div className="flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full">
-                <svg
-                  className="w-4 h-4"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="font-medium">{data.estimatedDuration}</span>
+    <div className="h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex flex-col">
+      {/* Layout */}
+      <div className="flex-1 grid grid-cols-12 overflow-hidden">
+        {/* Left Sidebar */}
+        <div className="col-span-3 overflow-auto bg-white/80 backdrop-blur-sm border-r border-gray-200/50 flex flex-col">
+          <div className="p-4 border-b border-gray-200/50">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Roadmap AI
+            </h2>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-sm">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span className="text-gray-600">
+                  {data.nodes.length} Main Topics
+                </span>
               </div>
-            )}
-
-            {data.difficultyLevel && (
-              <div className="flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-full">
-                <svg
-                  className="w-4 h-4"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="font-medium">{data.difficultyLevel}</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-lg hover:shadow-xl transition-all duration-300">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p className="text-3xl font-bold text-gray-900">
-                  {data.nodes.length}
-                </p>
-                <p className="text-sm text-gray-600 font-medium">Main Topics</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-lg hover:shadow-xl transition-all duration-300">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-green-500 rounded-xl flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p className="text-3xl font-bold text-gray-900">
+              <div className="flex items-center gap-2 text-sm">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-gray-600">
                   {data.nodes.reduce(
                     (acc, node) => acc + node.subtopics.length,
                     0
-                  )}
-                </p>
-                <p className="text-sm text-gray-600 font-medium">
+                  )}{" "}
                   Learning Steps
-                </p>
+                </span>
               </div>
+              {data.estimatedDuration && (
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                  <span className="text-gray-600">
+                    {data.estimatedDuration}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-lg hover:shadow-xl transition-all duration-300">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-violet-500 to-purple-500 rounded-xl flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
+          <div className="flex-1 overflow-y-auto p-4">
+            <h3 className="text-sm font-medium text-gray-900 mb-3">Topics</h3>
+            <div className="space-y-2 ">
+              {data.nodes.map((node, index) => (
+                <div
+                  key={index}
+                  className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p className="text-3xl font-bold text-gray-900">
-                  {data.difficultyLevel || "Adaptive"}
-                </p>
-                <p className="text-sm text-gray-600 font-medium">
-                  Difficulty Level
-                </p>
-              </div>
+                  <div className="font-medium text-sm text-gray-900 mb-1">
+                    {node.title}
+                  </div>
+                  <div className="text-xs text-gray-600">
+                    {node.subtopics.length} subtopics
+                  </div>
+                  {node.duration && (
+                    <div className="text-xs text-blue-600 mt-1">
+                      {node.duration}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="container mx-auto px-6 pb-8">
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl border border-gray-200/50 shadow-2xl overflow-hidden">
-          <div className="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-4 border-b border-gray-200/50">
-            <div className="flex flex-col items-start justify-between">
-              <h2 className="text-xl font-bold text-gray-900">Roadmap</h2>
-              <p className="text-gray-600 text-sm">
-                Explore your learning path • Hover over subtopics for details
-              </p>
-            </div>
+        <div className="flex-1 col-span-9 grid grid-cols-12 ">
+          {/* Middle Canvas */}
+          <div className="border-r-2 border-l-2 border-gray-400 col-span-8 bg-white/50 backdrop-blur-sm">
+            <Canvas
+              nodes={nodes}
+              edges={edges}
+              onSubtopicClick={handleSubtopicClick}
+            />
           </div>
-          <div className="h-screen">
-            <Canvas nodes={nodes} edges={edges} />
+
+          {/* Right Sidebar */}
+          <div className=" col-span-4 bg-white/80 backdrop-blur-sm  flex flex-col">
+            <Tabs.Root
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="flex flex-col h-full"
+            >
+              {/* Tabs Header */}
+              <div className="p-4 border-b border-gray-200/50">
+                <Tabs.List className="flex bg-gray-100 rounded-lg p-1">
+                  <Tabs.Trigger
+                    value="chat"
+                    className="flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900"
+                  >
+                    <div className="flex items-center gap-2">
+                      <svg
+                        className="w-4 h-4"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      AI Chat
+                    </div>
+                  </Tabs.Trigger>
+                  <Tabs.Trigger
+                    value="details"
+                    className="flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900"
+                  >
+                    <div className="flex items-center gap-2">
+                      <svg
+                        className="w-4 h-4"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      Details
+                    </div>
+                  </Tabs.Trigger>
+                </Tabs.List>
+              </div>
+
+              {/* Tabs */}
+              <div className="flex-1 overflow-hidden">
+                {/* AI Tab */}
+                <Tabs.Content value="chat" className="h-full overflow-y-auto">
+                  <div className="p-4 flex items-center justify-center h-full">
+                    <div className="text-center text-gray-500">
+                      <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto mb-3 flex items-center justify-center">
+                        <svg
+                          className="w-6 h-6 text-white"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                      <p className="text-sm font-medium">AI Assistant</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Coming soon - Chat with AI about your roadmap
+                      </p>
+                    </div>
+                  </div>
+                </Tabs.Content>
+
+                {/* Subtopic Tab */}
+                <Tabs.Content
+                  value="details"
+                  className="h-full overflow-y-auto"
+                >
+                  {selectedSubtopic ? (
+                    <div className="p-4 space-y-4">
+                      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                        <h3 className="text-xl font-bold text-blue-900 mb-2">
+                          {selectedSubtopic.title}
+                        </h3>
+                      </div>
+
+                      <div>
+                        <h4 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                          <svg
+                            className="w-5 h-5 text-blue-500"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Description
+                        </h4>
+                        <p className="text-gray-700 leading-relaxed text-sm">
+                          {selectedSubtopic.description}
+                        </p>
+                      </div>
+
+                      {selectedSubtopic.practicalExample && (
+                        <div>
+                          <h4 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                            <svg
+                              className="w-5 h-5 text-green-500"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            Practical Example
+                          </h4>
+                          <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                            <p className="text-green-800 leading-relaxed text-sm">
+                              {selectedSubtopic.practicalExample}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="p-4 flex items-center justify-center h-full">
+                      <div className="text-center text-gray-500">
+                        <div className="w-12 h-12 bg-gray-200 rounded-full mx-auto mb-3 flex items-center justify-center">
+                          <svg
+                            className="w-6 h-6 text-gray-400"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                        <p className="text-sm font-medium">No Topic Selected</p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          Click any subtopic in the roadmap to view details
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </Tabs.Content>
+              </div>
+            </Tabs.Root>
           </div>
         </div>
       </div>

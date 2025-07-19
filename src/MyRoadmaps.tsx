@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "./hooks/useAuth";
 import { databases } from "./lib/appwrite";
 import { Query } from "appwrite";
 import { useNavigate } from "react-router-dom";
+import type { RootState } from "./store/store";
+import { useSelector } from "react-redux";
 
 interface SavedRoadmap {
   $id: string;
@@ -12,27 +13,27 @@ interface SavedRoadmap {
 }
 
 const MyRoadmaps = () => {
-  const auth = useAuth();
+  const user = useSelector((state: RootState) => state.auth.data);
+
   const navigate = useNavigate();
   const [roadmaps, setRoadmaps] = useState<SavedRoadmap[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!auth?.user) {
+    if (!user) {
       navigate("/");
       return;
     }
 
     const fetchRoadmaps = async () => {
       try {
-        if (!auth?.user) return;
+        if (!user) return;
 
         const response = await databases.listDocuments(
           "6874d2200030c6ec9e6f",
           "6874d24a0021ae17ca60",
-          [Query.equal("userId", auth.user.$id), Query.orderDesc("$createdAt")]
+          [Query.equal("userId", user.$id), Query.orderDesc("$createdAt")]
         );
-        console.log("🚀 ~ fetchRoadmaps ~ response:", response);
         setRoadmaps(response.documents as unknown as SavedRoadmap[]);
       } catch (error) {
         console.error("Error fetching roadmaps:", error);
@@ -42,7 +43,7 @@ const MyRoadmaps = () => {
     };
 
     fetchRoadmaps();
-  }, [auth?.user, navigate]);
+  }, [user, navigate]);
 
   if (loading) {
     return (
@@ -84,9 +85,7 @@ const MyRoadmaps = () => {
               </button>
             </div>
             <h1 className="text-xl font-bold text-gray-900">My Roadmaps</h1>
-            <div className="text-sm text-gray-600">
-              Welcome, {auth?.user?.name}
-            </div>
+            <div className="text-sm text-gray-600">Welcome, {user?.name}</div>
           </div>
         </div>
       </header>

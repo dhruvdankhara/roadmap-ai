@@ -4,6 +4,7 @@ interface NodeData {
   label: string;
   duration?: string;
   prerequisite?: string;
+  isRight: boolean;
 }
 
 interface MainNodeProps {
@@ -70,21 +71,21 @@ MainNodeProps) => {
 
       <Handle
         type="target"
-        position={Position.Left}
+        position={Position.Top}
         id="a"
         className="w-3 h-3 border-2 border-white bg-violet-500"
       />
 
       <Handle
         type="source"
-        position={Position.Right}
+        position={Position.Bottom}
         id="b"
         className="w-3 h-3 border-2 border-white bg-violet-500"
       />
 
       <Handle
         type="source"
-        position={Position.Bottom}
+        position={data.isRight ? Position.Right : Position.Left}
         id="c"
         className="w-3 h-3 border-2 border-white bg-violet-500"
       />

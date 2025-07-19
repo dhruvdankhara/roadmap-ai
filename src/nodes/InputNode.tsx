@@ -38,7 +38,7 @@ const InputNode = ({ data }: InputNodeProps) => {
 
       <Handle
         type="source"
-        position={Position.Right}
+        position={Position.Bottom}
         id="1"
         className="w-4 h-4 border-2 border-white bg-emerald-400"
       />

@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { callGeminiAPI } from "./lib/gemini";
-import { databases } from "./lib/appwrite";
+import { account, databases } from "./lib/appwrite";
 import { ID } from "appwrite";
 import LoginDialog from "./LoginDialog";
-import { useAuth } from "./hooks/useAuth";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "./store/store";
+import { login, logout, type User } from "./store/slices/authSlice";
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const authContext = useAuth();
-  const user = authContext?.user;
+  const dispatch = useDispatch();
+
+  const user = useSelector((state: RootState) => state.auth.data);
 
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -63,6 +66,7 @@ const HomePage = () => {
         onClose={() => setShowLoginDialog(false)}
         onLoginSuccess={(userData) => {
           console.log("Login successful:", userData);
+          dispatch(login(userData as User));
           setShowLoginDialog(false);
         }}
       />
@@ -91,7 +95,10 @@ const HomePage = () => {
                   Welcome, {user.name}
                 </span>
                 <button
-                  onClick={() => authContext?.logout?.()}
+                  onClick={async () => {
+                    await account.deleteSession("current");
+                    dispatch(logout());
+                  }}
                   className="text-sm text-gray-600 hover:text-gray-900 font-medium"
                 >
                   Sign Out
