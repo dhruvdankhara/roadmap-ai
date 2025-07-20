@@ -1,12 +1,12 @@
 import "@xyflow/react/dist/style.css";
 import { useEffect, useState } from "react";
 import { MarkerType, type Node, type Edge } from "@xyflow/react";
-import * as Tabs from "@radix-ui/react-tabs";
 import Canvas from "./Canvas";
 import { databases } from "./lib/appwrite";
 import { useParams } from "react-router-dom";
+import LearningPanel from "./LearningPanel";
 
-interface Subtopic {
+export interface Subtopic {
   title: string;
   description: string;
   practicalExample: string;
@@ -270,166 +270,13 @@ const OverviewFlow = () => {
           </div>
 
           {/* Right Sidebar */}
-          <div className=" col-span-4 bg-white/80 backdrop-blur-sm  flex flex-col">
-            <Tabs.Root
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className="flex flex-col h-full"
-            >
-              {/* Tabs Header */}
-              <div className="p-4 border-b border-gray-200/50">
-                <Tabs.List className="flex bg-gray-100 rounded-lg p-1">
-                  <Tabs.Trigger
-                    value="chat"
-                    className="flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900"
-                  >
-                    <div className="flex items-center gap-2">
-                      <svg
-                        className="w-4 h-4"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      AI Chat
-                    </div>
-                  </Tabs.Trigger>
-                  <Tabs.Trigger
-                    value="details"
-                    className="flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900"
-                  >
-                    <div className="flex items-center gap-2">
-                      <svg
-                        className="w-4 h-4"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      Details
-                    </div>
-                  </Tabs.Trigger>
-                </Tabs.List>
-              </div>
-
-              {/* Tabs */}
-              <div className="flex-1 overflow-hidden">
-                {/* AI Tab */}
-                <Tabs.Content value="chat" className="h-full overflow-y-auto">
-                  <div className="p-4 flex items-center justify-center h-full">
-                    <div className="text-center text-gray-500">
-                      <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto mb-3 flex items-center justify-center">
-                        <svg
-                          className="w-6 h-6 text-white"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </div>
-                      <p className="text-sm font-medium">AI Assistant</p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Coming soon - Chat with AI about your roadmap
-                      </p>
-                    </div>
-                  </div>
-                </Tabs.Content>
-
-                {/* Subtopic Tab */}
-                <Tabs.Content
-                  value="details"
-                  className="h-full overflow-y-auto"
-                >
-                  {selectedSubtopic ? (
-                    <div className="p-4 space-y-4">
-                      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                        <h3 className="text-xl font-bold text-blue-900 mb-2">
-                          {selectedSubtopic.title}
-                        </h3>
-                      </div>
-
-                      <div>
-                        <h4 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                          <svg
-                            className="w-5 h-5 text-blue-500"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          Description
-                        </h4>
-                        <p className="text-gray-700 leading-relaxed text-sm">
-                          {selectedSubtopic.description}
-                        </p>
-                      </div>
-
-                      {selectedSubtopic.practicalExample && (
-                        <div>
-                          <h4 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                            <svg
-                              className="w-5 h-5 text-green-500"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            Practical Example
-                          </h4>
-                          <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                            <p className="text-green-800 leading-relaxed text-sm">
-                              {selectedSubtopic.practicalExample}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="p-4 flex items-center justify-center h-full">
-                      <div className="text-center text-gray-500">
-                        <div className="w-12 h-12 bg-gray-200 rounded-full mx-auto mb-3 flex items-center justify-center">
-                          <svg
-                            className="w-6 h-6 text-gray-400"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </div>
-                        <p className="text-sm font-medium">No Topic Selected</p>
-                        <p className="text-xs text-gray-400 mt-1">
-                          Click any subtopic in the roadmap to view details
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </Tabs.Content>
-              </div>
-            </Tabs.Root>
+          <div className="col-span-4 bg-white/80 backdrop-blur-sm flex flex-col h-full ">
+            <LearningPanel
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              selectedSubtopic={selectedSubtopic}
+              roadmapData={data}
+            />
           </div>
         </div>
       </div>

@@ -102,3 +102,33 @@ export async function callGeminiAPI(
     throw error;
   }
 }
+
+export async function callGeminiChat(
+  prompt: string,
+  model = "gemini-2.5-flash"
+): Promise<string> {
+  try {
+    const response = await ai.models.generateContent({
+      model: model,
+      contents: [
+        {
+          parts: [
+            {
+              text: prompt,
+            },
+          ],
+        },
+      ],
+    });
+
+    return (
+      response.text ||
+      "I'm sorry, I couldn't generate a response. Please try again."
+    );
+  } catch (error) {
+    console.error("Error calling Gemini Chat API:", error);
+    throw new Error(
+      "Failed to get AI response. Please check your connection and try again."
+    );
+  }
+}
