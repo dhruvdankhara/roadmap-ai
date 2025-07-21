@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import { MarkerType, type Node, type Edge } from "@xyflow/react";
 import Canvas from "./Canvas";
 import { databases } from "./lib/appwrite";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import LearningPanel from "./LearningPanel";
+import { IoIosArrowBack } from "react-icons/io";
 
 export interface Subtopic {
   title: string;
@@ -31,6 +32,7 @@ interface RoadmapData {
 
 const OverviewFlow = () => {
   const { roadmapId } = useParams<{ roadmapId: string }>();
+  const navigate = useNavigate();
 
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
@@ -42,7 +44,7 @@ const OverviewFlow = () => {
 
   const handleSubtopicClick = (subtopic: Subtopic) => {
     setSelectedSubtopic(subtopic);
-    setActiveTab("details");
+    // setActiveTab("details");
   };
 
   const generateNodeEdges = (data: RoadmapData): void => {
@@ -180,7 +182,7 @@ const OverviewFlow = () => {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-indigo-100 flex items-center justify-center">
         <div className="text-center p-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-violet-100 rounded-full mb-6">
             <div className="w-8 h-8 border-3 border-violet-600 border-t-transparent rounded-full animate-spin"></div>
@@ -197,15 +199,46 @@ const OverviewFlow = () => {
   }
 
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex flex-col">
+    <div className="h-screen bg-indigo-100 flex flex-col">
       {/* Layout */}
-      <div className="flex-1 grid grid-cols-12 overflow-hidden">
+      <div className="flex-1 flex overflow-hidden">
         {/* Left Sidebar */}
-        <div className="col-span-3 overflow-auto bg-white/80 backdrop-blur-sm border-r border-gray-200/50 flex flex-col">
-          <div className="p-4 border-b border-gray-200/50">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              Roadmap AI
-            </h2>
+        <div className="w-1/4 min-w-[300px] max-w-[400px] bg-white/80 backdrop-blur-sm border-r border-gray-200/50 flex flex-col overflow-scroll">
+          <div className="p-4 border-b border-gray-200/50 flex-shrink-0">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors"
+            >
+              <IoIosArrowBack className="w-5 h-5" />
+              <span className="text-sm font-medium">Back</span>
+            </button>
+
+            <h1 className="text-2xl font-bold text-gray-900 mb-2 leading-tight">
+              {data.title}
+            </h1>
+
+            {data.description && (
+              <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                {data.description}
+              </p>
+            )}
+
+            {data.difficultyLevel && (
+              <div className="mb-4">
+                <span
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    data.difficultyLevel.toLowerCase() === "beginner"
+                      ? "bg-green-100 text-green-800"
+                      : data.difficultyLevel.toLowerCase() === "intermediate"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  {data.difficultyLevel}
+                </span>
+              </div>
+            )}
+
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-sm">
                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
@@ -234,23 +267,35 @@ const OverviewFlow = () => {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4">
-            <h3 className="text-sm font-medium text-gray-900 mb-3">Topics</h3>
-            <div className="space-y-2 ">
+          <div className="flex-1 p-4">
+            <h3 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
+              Learning Path
+            </h3>
+            <div className="space-y-3">
               {data.nodes.map((node, index) => (
                 <div
                   key={index}
-                  className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                  className="p-4 0 rounded-xl transition-all border border-gray-200"
                 >
-                  <div className="font-medium text-sm text-gray-900 mb-1">
-                    {node.title}
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="font-semibold text-sm text-gray-900 leading-tight">
+                      {index + 1}. {node.title}
+                    </div>
+
+                    {node.duration && (
+                      <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full font-medium">
+                        {node.duration}
+                      </span>
+                    )}
                   </div>
-                  <div className="text-xs text-gray-600">
+
+                  <div className="text-xs text-gray-600 mb-2">
                     {node.subtopics.length} subtopics
                   </div>
-                  {node.duration && (
-                    <div className="text-xs text-blue-600 mt-1">
-                      {node.duration}
+
+                  {node.prerequisite && (
+                    <div className="text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded font-medium">
+                      Prerequisite: {node.prerequisite}
                     </div>
                   )}
                 </div>
@@ -259,25 +304,23 @@ const OverviewFlow = () => {
           </div>
         </div>
 
-        <div className="flex-1 col-span-9 grid grid-cols-12 ">
-          {/* Middle Canvas */}
-          <div className="border-r-2 border-l-2 border-gray-400 col-span-8 bg-white/50 backdrop-blur-sm">
-            <Canvas
-              nodes={nodes}
-              edges={edges}
-              onSubtopicClick={handleSubtopicClick}
-            />
-          </div>
+        {/* canvas */}
+        <div className="flex-1 border-r-2 border-l-2 border-gray-400 bg-white/50 backdrop-blur-sm">
+          <Canvas
+            nodes={nodes}
+            edges={edges}
+            onSubtopicClick={handleSubtopicClick}
+          />
+        </div>
 
-          {/* Right Sidebar */}
-          <div className="col-span-4 bg-white/80 backdrop-blur-sm flex flex-col h-full ">
-            <LearningPanel
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              selectedSubtopic={selectedSubtopic}
-              roadmapData={data}
-            />
-          </div>
+        {/* Right Sidebar */}
+        <div className="w-1/3 min-w-[350px] max-w-[450px] bg-white/80 backdrop-blur-sm flex flex-col h-full overflow-hidden">
+          <LearningPanel
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            selectedSubtopic={selectedSubtopic}
+            roadmapData={data}
+          />
         </div>
       </div>
     </div>

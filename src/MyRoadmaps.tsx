@@ -4,6 +4,9 @@ import { Query } from "appwrite";
 import { useNavigate } from "react-router-dom";
 import type { RootState } from "./store/store";
 import { useSelector } from "react-redux";
+import { IoChevronBack, IoReorderFour } from "react-icons/io5";
+import { MdOutlineViewList } from "react-icons/md";
+import { FaClock } from "react-icons/fa";
 
 interface SavedRoadmap {
   $id: string;
@@ -47,7 +50,7 @@ const MyRoadmaps = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-indigo-100 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-violet-100 rounded-full mb-6">
             <div className="w-8 h-8 border-3 border-violet-600 border-t-transparent rounded-full animate-spin"></div>
@@ -61,7 +64,7 @@ const MyRoadmaps = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-indigo-100">
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
@@ -70,17 +73,7 @@ const MyRoadmaps = () => {
                 onClick={() => navigate("/")}
                 className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+                <IoChevronBack className="w-5 h-5" />
                 <span className="font-medium">Back to Home</span>
               </button>
             </div>
@@ -94,17 +87,7 @@ const MyRoadmaps = () => {
         {roadmaps.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg
-                className="w-12 h-12 text-gray-400"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <MdOutlineViewList className="w-12 h-12 text-gray-400" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               No Roadmaps Yet
@@ -141,32 +124,12 @@ const MyRoadmaps = () => {
                   <div className="flex items-center justify-between text-xs text-gray-500">
                     <div className="flex items-center gap-4">
                       <span className="flex items-center gap-1">
-                        <svg
-                          className="w-3 h-3"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
+                        <IoReorderFour className="w-3 h-3" />
                         {parsedData.nodes?.length || 0} topics
                       </span>
                       {parsedData.estimatedDuration && (
                         <span className="flex items-center gap-1">
-                          <svg
-                            className="w-3 h-3"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
+                          <FaClock className="w-3 h-3" />
                           {parsedData.estimatedDuration}
                         </span>
                       )}

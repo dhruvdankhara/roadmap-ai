@@ -7,6 +7,10 @@ import LoginDialog from "./LoginDialog";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "./store/store";
 import { login, logout, type User } from "./store/slices/authSlice";
+import { FaCheck, FaStar } from "react-icons/fa";
+import { BsInfoCircleFill } from "react-icons/bs";
+import { HiLightningBolt } from "react-icons/hi";
+import { IoReorderFour } from "react-icons/io5";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -60,7 +64,7 @@ const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex flex-col">
+    <div className="min-h-screen bg-indigo-100 flex flex-col">
       <LoginDialog
         isOpen={showLoginDialog}
         onClose={() => setShowLoginDialog(false)}
@@ -120,10 +124,8 @@ const HomePage = () => {
         <div className="max-w-4xl w-full">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm border border-violet-200 text-violet-700 px-6 py-3 rounded-full text-sm font-medium mb-8 shadow-lg">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-              <span>Powered by Google Gemini AI</span>
+              <FaStar className="w-4 h-4" />
+              <span>Powered by AI</span>
             </div>
 
             <h1 className="text-4xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
@@ -183,17 +185,7 @@ const HomePage = () => {
                   </span>
                   {inputText.length > 50 && (
                     <div className="flex items-center gap-1 text-green-600">
-                      <svg
-                        className="w-4 h-4"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
+                      <FaCheck className="w-4 h-4 " />
                       <span className="text-sm font-medium">Good detail</span>
                     </div>
                   )}
@@ -203,17 +195,8 @@ const HomePage = () => {
               <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between pt-6 border-t border-gray-100">
                 <div className="flex items-center gap-4 text-sm text-gray-500">
                   <div className="flex items-center gap-2">
-                    <svg
-                      className="w-4 h-4"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+                    <BsInfoCircleFill className="w-4 h-4" />
+
                     <span>Results in 10-30 seconds</span>
                   </div>
                 </div>
@@ -237,7 +220,7 @@ const HomePage = () => {
                     flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 transform
                     ${
                       inputText.trim().length > 3 && !isLoading
-                        ? "bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-700 hover:to-purple-700 hover:scale-105 hover:shadow-2xl shadow-lg"
+                        ? "bg-purple-600 text-white hover:bg-violet-700 hover:scale-105 hover:shadow-2xl shadow-lg"
                         : "bg-gray-200 text-gray-400 cursor-not-allowed"
                     }
                   `}
@@ -249,17 +232,7 @@ const HomePage = () => {
                     </>
                   ) : (
                     <>
-                      <svg
-                        className="w-5 h-5"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
+                      <HiLightningBolt className="w-5 h-5" />
                       Generate Roadmap
                     </>
                   )}
@@ -270,18 +243,8 @@ const HomePage = () => {
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="group text-center p-8 bg-white/40 backdrop-blur-sm rounded-3xl border border-gray-200/50 hover:bg-white/60 transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <div className="w-16 h-16 bg-gradient-to-r from-violet-500 to-purple-500 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <svg
-                  className="w-8 h-8 text-white"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+              <div className="w-16 h-16 bg-purple-500 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                <HiLightningBolt className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">
                 Lightning Fast Generation
@@ -293,18 +256,8 @@ const HomePage = () => {
             </div>
 
             <div className="group text-center p-8 bg-white/40 backdrop-blur-sm rounded-3xl border border-gray-200/50 hover:bg-white/60 transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <svg
-                  className="w-8 h-8 text-white"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+              <div className="w-16 h-16 bg-cyan-500 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                <IoReorderFour className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">
                 Structured & Visual
@@ -316,17 +269,8 @@ const HomePage = () => {
             </div>
 
             <div className="group text-center p-8 bg-white/40 backdrop-blur-sm rounded-3xl border border-gray-200/50 hover:bg-white/60 transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <div className="w-16 h-16 bg-gradient-to-r from-emerald-500 to-green-500 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <svg
-                  className="w-8 h-8 text-white"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-                  />
-                </svg>
+              <div className="w-16 h-16 bg-green-500 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                <FaStar className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">
                 AI-Powered Intelligence
