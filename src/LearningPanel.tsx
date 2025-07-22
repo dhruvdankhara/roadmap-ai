@@ -105,8 +105,10 @@ const LearningPanel = ({
       USER MESSAGE: ${userMessage}
 
       INSTRUCTIONS:
+      - Give long response only when needed
       - Provide helpful, encouraging, and educational responses
       - Reference the roadmap context when relevant
+      - If user ask for resource suggest some youtube video link and ohter course website
       - If asked about specific topics, explain them clearly with practical examples
       - Suggest next steps or learning strategies when appropriate
       - Keep responses conversational but informative

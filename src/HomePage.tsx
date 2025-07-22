@@ -75,35 +75,37 @@ const HomePage = () => {
         }}
       />
 
-      <header className="px-6 py-4">
+      <header className="px-6 py-4 border-b border-white/20 backdrop-blur-md bg-white/10">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-xl font-bold text-gray-900">RoadmapAI</span>
-          </div>
+          <div className="text-xl font-bold text-gray-900">RoadmapAI</div>
 
           <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-2 text-sm text-gray-600">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-              <span>AI Powered</span>
-            </div>
-
             {user ? (
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => navigate("/my-roadmaps")}
-                  className="text-sm text-violet-600 hover:text-violet-700 font-medium"
+                  className="cursor-pointer flex items-center gap-2 text-sm text-violet-600 hover:text-violet-700 font-medium bg-violet-50/80 hover:bg-violet-100/80 backdrop-blur-sm px-4 py-2 rounded-lg transition-all duration-200 border border-violet-200/50"
                 >
                   My Roadmaps
                 </button>
-                <span className="text-sm text-gray-600">
-                  Welcome, {user.name}
-                </span>
+
+                <div className="flex items-center gap-3 bg-white/50 backdrop-blur-sm px-3 py-2 rounded-lg border border-gray-200/50">
+                  <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-xs font-medium">
+                      {user.name?.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <span className="text-sm text-gray-700 font-medium hidden sm:block">
+                    {user.name}
+                  </span>
+                </div>
+
                 <button
                   onClick={async () => {
                     await account.deleteSession("current");
                     dispatch(logout());
                   }}
-                  className="text-sm text-gray-600 hover:text-gray-900 font-medium"
+                  className="text-sm text-gray-600 hover:text-gray-900 font-medium bg-gray-50/80 hover:bg-gray-100/80 px-3 py-2 rounded-lg transition-all duration-200 border border-gray-200/50"
                 >
                   Sign Out
                 </button>
@@ -111,7 +113,7 @@ const HomePage = () => {
             ) : (
               <button
                 onClick={() => setShowLoginDialog(true)}
-                className="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+                className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 Sign In
               </button>
