@@ -52,7 +52,7 @@ const Canvas = ({
     reactFlowInstance.fitView({
       nodes: [{ id: "1" }, { id: "anotation-node" }],
       duration: 800,
-      padding: 0.6,
+      padding: 2.5,
     });
   };
 

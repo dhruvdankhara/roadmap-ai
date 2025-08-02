@@ -6,6 +6,7 @@ import { databases } from "./lib/appwrite";
 import { useParams, useNavigate } from "react-router-dom";
 import LearningPanel from "./LearningPanel";
 import { IoIosArrowBack } from "react-icons/io";
+import { FaDesktop } from "react-icons/fa6";
 
 export interface Subtopic {
   title: string;
@@ -69,11 +70,11 @@ const OverviewFlow = () => {
 
     const config = {
       startY: 0,
-      mainNodeSpacingY: 150,
+      mainNodeSpacingY: 0,
       mainNodeX: 0,
       subtopicX: 600,
-      subtopicSpacingY: 200,
-      minSubtopicSpacing: 100,
+      subtopicSpacingY: 150,
+      minSubtopicSpacing: 0,
     };
 
     // Start node
@@ -82,7 +83,7 @@ const OverviewFlow = () => {
       id: startNodeId.toString(),
       type: "start",
       data: { label: data.title },
-      position: { y: config.startY, x: config.mainNodeX },
+      position: { y: -150, x: 0 },
     });
 
     let currentMainY = config.startY + config.mainNodeSpacingY;
@@ -93,10 +94,7 @@ const OverviewFlow = () => {
 
       // Calculate space
       const subtopicCount = mainTopic.subtopics.length;
-      const requiredWidth = Math.max(
-        subtopicCount * config.subtopicSpacingY,
-        config.minSubtopicSpacing * subtopicCount
-      );
+      const requiredWidth = (subtopicCount - 1) * config.subtopicSpacingY;
 
       const mainNodeY = currentMainY + requiredWidth / 2 - 100;
 
@@ -124,7 +122,7 @@ const OverviewFlow = () => {
       });
 
       // subtopics
-      const subtopicStartY = currentMainY + 50;
+      const subtopicStartY = -config.subtopicSpacingY / 2 + mainNodeY - 100;
       mainTopic.subtopics.forEach((subtopic, subtopicIndex) => {
         const subtopicNodeId = `${mainNodeId}-sub-${subtopicIndex}`;
         const subtopicY =
@@ -200,8 +198,27 @@ const OverviewFlow = () => {
 
   return (
     <div className="h-screen bg-indigo-100 flex flex-col">
-      {/* Layout */}
-      <div className="flex-1 flex overflow-hidden">
+      {/* Small Screen */}
+      <div className="lg:hidden min-h-screen bg-indigo-100 flex items-center justify-center p-6">
+        <div className="text-center max-w-md mx-auto">
+          <div className="inline-flex items-center justify-center w-20 h-20 mb-6">
+            <FaDesktop className="w-10 h-10 text-violet-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Desktop Required
+          </h1>
+
+          <button
+            onClick={() => navigate(-1)}
+            className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors font-medium"
+          >
+            <IoIosArrowBack className="w-4 h-4" />
+            Go Back
+          </button>
+        </div>
+      </div>
+
+      <div className="hidden lg:flex flex-1 overflow-hidden">
         {/* Left Sidebar */}
         <div className="w-1/4 min-w-[300px] max-w-[400px] bg-white/80 backdrop-blur-sm border-r border-gray-200/50 flex flex-col overflow-scroll">
           <div className="p-4 border-b border-gray-200/50 flex-shrink-0">
